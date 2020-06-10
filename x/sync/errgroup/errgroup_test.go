@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mway/pkg/x/errgroup"
+	"github.com/mway/pkg/x/sync/errgroup"
 	"github.com/stretchr/testify/require"
 )
 
