@@ -20,9 +20,7 @@ func (p Path) Extend(cost int, vertex Key) Path {
 	dup.Cost += cost
 
 	dup.Vertices = make([]Key, len(p.Vertices), len(p.Vertices)+1)
-	for i, v := range p.Vertices {
-		dup.Vertices[i] = v
-	}
+	copy(dup.Vertices, p.Vertices)
 	dup.Vertices = append(dup.Vertices, vertex)
 
 	return dup

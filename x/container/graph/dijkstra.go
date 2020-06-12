@@ -8,12 +8,10 @@ import (
 // path possible within the graph.
 func Dijkstra(g *Graph, from Key, to Key) Path {
 	var (
-		internalFrom = internal.Key(from.key)
-		internalTo   = internal.Key(to.key)
-		visited      = make(map[internal.Key]struct{})
-		heap         = internal.NewPathHeap(internal.Path{
+		visited = make(map[internal.Key]struct{})
+		heap    = internal.NewPathHeap(internal.Path{
 			Cost:     0,
-			Vertices: []internal.Key{internalFrom},
+			Vertices: []internal.Key{from.key},
 		})
 	)
 
@@ -27,7 +25,7 @@ func Dijkstra(g *Graph, from Key, to Key) Path {
 			continue
 		}
 
-		if key == internalTo {
+		if key == to.key {
 			return newPathFromInternal(path)
 		}
 

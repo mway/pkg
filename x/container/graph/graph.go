@@ -16,27 +16,30 @@ var (
 	// Root is a default key for specifying graph iteration and/or filtering.
 	Root = Key{key: internal.Key(math.MaxUint64 - 1)}
 
-	_zeroKey    Key
-	_zeroVertex Vertex
+	_zeroKey Key
 )
 
 type (
-	// VertexFilterFunc is used by Graph as a predicate function to filter its vertices.
+	// VertexFilterFunc is used by Graph as a predicate function to filter its
+	// vertices.
 	VertexFilterFunc = func(Vertex) bool
 	// VertexVisitorFunc is used by Graph to yield visited vertices to callers.
 	VertexVisitorFunc = func(Vertex) bool
-	// EdgeFilterFunc is used by Graph as a predicate function to filter its edges.
+	// EdgeFilterFunc is used by Graph as a predicate function to filter its
+	// edges.
 	EdgeFilterFunc = func(Edge) bool
 	// EdgeVisitorFunc is used by Graph to yield visited edges to callers.
 	EdgeVisitorFunc = func(Edge) bool
-	// FindPathFunc is used by Graph do perform pluggable pathing/costing for a single path.
+	// FindPathFunc is used by Graph do perform pluggable pathing/costing for a
+	// single path.
 	FindPathFunc = func(graph *Graph, from Key, to Key) Path
-	// FindPathsFunc is used by Graph to perform pluggable pathing/costing for multiple paths.
+	// FindPathsFunc is used by Graph to perform pluggable pathing/costing for
+	// multiple paths.
 	FindPathsFunc = func(graph *Graph, from Key, to Key) Paths
 )
 
-// A Graph is a basic data structure defined as a set of vertices and a set of edges.
-// Graphs may be either directed or undirected.
+// A Graph is a basic data structure defined as a set of vertices and a set of
+// edges. Graphs may be either directed or undirected.
 type Graph struct {
 	lastKey  uint64
 	mtx      sync.Mutex
