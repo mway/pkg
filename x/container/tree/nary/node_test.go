@@ -79,6 +79,9 @@ func TestNodeDeletion(t *testing.T) {
 
 	require.Equal(t, total, getValues())
 
+	// n.b. No effect.
+	root.Delete(tree.Key{})
+
 	root.Delete(key10)
 	require.Equal(t, total[:9], getValues())
 

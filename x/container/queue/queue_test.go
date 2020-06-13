@@ -26,6 +26,7 @@ func TestQueue(t *testing.T) {
 
 			require.Equal(t, nil, queue.Front())
 			require.Equal(t, nil, queue.Back())
+			require.Equal(t, nil, queue.Dequeue())
 
 			for i := 0; i < num; i++ {
 				queue.Push(tc.values[i])

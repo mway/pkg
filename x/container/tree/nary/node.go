@@ -30,10 +30,11 @@ type Node struct {
 func NewTree(k uint, value interface{}) *Node {
 	node := &Node{
 		Node: tree.Node{
-			Key:   tree.NewKey(0),
+			Key:   tree.NewKey(1),
 			Value: value,
 		},
-		k: k,
+		k:      k,
+		lastID: 1,
 	}
 
 	node.idx = map[tree.Key]*Node{
@@ -54,10 +55,6 @@ func (n *Node) Delete(key tree.Key) {
 		node, ok := n.getNode(cur.Key)
 		if !ok {
 			return false
-		}
-
-		if node.numChildren() > 0 {
-			panic("deleting node with children")
 		}
 
 		n.unindex(node.Key)
@@ -116,8 +113,6 @@ func (n *Node) Iterate(
 		n.traversePostOrder(handler)
 	case tree.PreOrder:
 		n.traversePreOrder(handler)
-	default:
-		panic("unsupported traversal order")
 	}
 }
 
@@ -133,11 +128,7 @@ func (n *Node) Root() tree.Key {
 
 func (n *Node) addChild(value interface{}) (key tree.Key) {
 	if children := n.numChildren(); uint(children) >= n.k {
-		panic(fmt.Sprintf(
-			"adding child to node with %d children while k = %d",
-			children,
-			n.k,
-		))
+		panic(fmt.Sprintf("cannot add child to node with %d children", children))
 	}
 
 	key = n.newKey()

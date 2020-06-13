@@ -24,6 +24,9 @@ func TestStack(t *testing.T) {
 				stack stack.Stack
 			)
 
+			require.Equal(t, nil, stack.Top())
+			require.Equal(t, nil, stack.Pop())
+
 			for i := 0; i < num; i++ {
 				stack.Push(tc.values[i])
 				require.Equal(t, tc.values[i], stack.Top())
