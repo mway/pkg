@@ -1,0 +1,12 @@
+language: go
+go:
+  - 1.13
+  - 1.14
+# before_script:
+#   - go mod tidy
+script:
+  - go test -v -race -count 1 ./...
+  - go build ./...
+notifications:
+  on_success: never
+  on_failure: always
