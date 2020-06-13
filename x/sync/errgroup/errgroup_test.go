@@ -79,13 +79,14 @@ func TestGroupErrors(t *testing.T) {
 		group.Go(fn)
 	}
 
+	err := group.Wait()
+
 	select {
 	case <-ctx.Done():
-		require.Fail(t, "context must be done")
 	default:
+		require.Fail(t, "context must be done after Wait()")
 	}
 
-	err := group.Wait()
 	require.Error(t, err)
 	require.Equal(t, "error", err.Error())
 	require.Equal(t, uint32(0), calls)
