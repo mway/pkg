@@ -7,6 +7,10 @@ Q = @
 test:
 	go test -v -race -count 1 ./...
 
+.PHONY: lint
+lint:
+	golangci-lint run ./...
+
 .PHONY: cover
 cover:
 	go test -race -coverprofile=cover.out ./...
