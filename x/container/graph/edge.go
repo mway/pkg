@@ -13,5 +13,10 @@ type Edge struct {
 
 // String returns a string representation of e.
 func (e *Edge) String() string {
-	return fmt.Sprintf("%v->%v(%d)", e.Start.Key(), e.End.Key(), e.Cost)
+	return fmt.Sprintf(
+		"%s->%s(%d)",
+		e.Start.Key().String(),
+		e.End.Key().String(),
+		e.Cost,
+	)
 }

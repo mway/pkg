@@ -1,6 +1,8 @@
 package graph
 
 import (
+	"fmt"
+
 	"github.com/mway/pkg/x/container/graph/internal"
 )
 
@@ -13,4 +15,8 @@ func newKey(key internal.Key) Key {
 	return Key{
 		key: key,
 	}
+}
+
+func (k Key) String() string {
+	return fmt.Sprintf("%v", k.key)
 }

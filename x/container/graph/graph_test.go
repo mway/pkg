@@ -3,6 +3,7 @@ package graph_test
 import (
 	"fmt"
 	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/mway/pkg/x/container/graph"
@@ -20,7 +21,11 @@ func TestGraph(t *testing.T) {
 
 				key1 := g.AddVertex(1)
 				key2 := g.AddVertex(2)
-				g.AddEdge(key1, key2)
+
+				require.Equal(t, 2, g.Order())
+				require.True(t, g.AddEdge(key1, key2))
+				require.False(t, g.AddEdge(graph.Key{}, key2))
+				require.False(t, g.AddEdge(key1, graph.Key{}))
 
 				return g
 			}(),
@@ -63,9 +68,59 @@ func TestGraphSubgraph(t *testing.T) {
 }
 
 func TestGraphDeleteVertex(t *testing.T) {
+	var (
+		g        = graph.New()
+		vertices = []graph.Key{
+			g.AddVertex(1),
+			g.AddVertex(2),
+			g.AddVertex(3),
+		}
+	)
+
+	numVertices := func() (n int) {
+		g.VisitVertices(graph.Root, func(graph.Vertex) bool {
+			n++
+			return true
+		})
+		return
+	}
+
+	for i := 0; i < len(vertices); i++ {
+		require.Equal(t, len(vertices[i:]), numVertices())
+		g.DeleteVertex(vertices[i])
+	}
+
+	require.Equal(t, 0, numVertices())
 }
 
 func TestGraphDeleteEdge(t *testing.T) {
+	var (
+		g        = graph.New()
+		vertices = []graph.Key{
+			g.AddVertex(1),
+			g.AddVertex(2),
+			g.AddVertex(3),
+		}
+	)
+
+	for i := 0; i < len(vertices)-1; i++ {
+		require.True(t, g.AddEdge(vertices[i], vertices[i+1]))
+	}
+
+	numEdges := func() (n int) {
+		g.VisitEdges(graph.Root, func(graph.Edge) bool {
+			n++
+			return true
+		})
+		return
+	}
+
+	for i := 0; i < len(vertices)-1; i++ {
+		require.Equal(t, len(vertices[i:])-1, numEdges())
+		g.DeleteEdge(vertices[i], vertices[i+1])
+	}
+
+	require.Equal(t, 0, numEdges())
 }
 
 func TestGraphFilterVertices(t *testing.T) {
@@ -266,4 +321,17 @@ func TestGraphEdges(t *testing.T) {
 
 		require.ElementsMatch(t, expected, actual)
 	})
+}
+
+func TestGraphString(t *testing.T) {
+	g := graph.New()
+
+	k1 := g.AddVertex(1)
+	k2 := g.AddVertex(2)
+	g.AddEdge(k1, k2)
+
+	parts := strings.Split(strings.TrimSpace(g.String()), "\n")
+	require.Equal(t, 2, len(parts))
+	require.Contains(t, parts, "2")
+	require.Contains(t, parts, "1\t2")
 }

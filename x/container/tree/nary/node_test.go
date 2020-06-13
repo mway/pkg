@@ -28,6 +28,12 @@ func TestNodeTraversal(t *testing.T) {
 			order:    tree.PostOrder,
 			expected: []interface{}{5, 6, 7, 2, 8, 9, 10, 3, 4, 1},
 		},
+		{
+			k:        3,
+			values:   []interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+			order:    tree.PreOrder,
+			expected: []interface{}{1, 5, 6, 7, 2, 8, 9, 10, 3, 4},
+		},
 	}
 
 	for i, tc := range cases {
