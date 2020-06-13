@@ -2,11 +2,15 @@ language: go
 go:
   - 1.13
   - 1.14
-# before_script:
-#   - go mod tidy
+
 script:
-  - go test -v -race -count 1 ./...
+  - make test
   - go build ./...
+
+after_success:
+  - make cover
+  - bash <(curl -s https://codecov.io/bash)
+
 notifications:
   on_success: never
   on_failure: always
