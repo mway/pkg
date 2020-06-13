@@ -12,5 +12,5 @@
 *.out
 cover.html
 
-# Dependency directories (remove the comment below to include it)
-# vendor/
+# Misc
+.DS_Store
