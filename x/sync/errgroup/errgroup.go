@@ -25,6 +25,8 @@ package errgroup
 import (
 	"context"
 	"sync"
+
+	"go.uber.org/multierr"
 )
 
 // A GroupableFunc is a function that is able to be processed as part of a
@@ -83,4 +85,60 @@ func (g *Group) Wait() error {
 	g.cancel()
 
 	return g.err
+}
+
+// MultiGroup is a Group variant that accumulates errors rather than simply
+// returning the first encountered. Semantically, this affords callers the
+// ability to determine whether or not launched goroutines should abort
+// immediately once the provided context is cancelled. If callers choose not
+// to respect the context, it is their responsibility to ensure that goroutines
+// do not leak.
+type MultiGroup struct {
+	group Group
+	mtx   sync.Mutex
+}
+
+// MultiWithContext returns a new MultiGroup and an associated Context derived
+// from ctx.
+//
+// The derived Context is canceled the first time a function passed to Go
+// returns a non-nil error or the first time Wait returns, whichever occurs
+// first.
+func MultiWithContext(ctx context.Context) (*MultiGroup, context.Context) {
+	ctx, cancel := context.WithCancel(ctx)
+
+	return &MultiGroup{
+		group: Group{
+			cancel: cancel,
+			ctx:    ctx,
+		},
+	}, ctx
+}
+
+// Go calls the given function in a new goroutine. Callers may choose whether or
+// not to respect the context (in order to have multiple launched routines'
+// errors combined), however it is the caller's responsibility to avoid
+// goroutine leaks in such cases.
+func (g *MultiGroup) Go(fn GroupableFunc) {
+	g.group.wg.Add(1)
+
+	go func() {
+		defer g.group.wg.Done()
+
+		if err := fn(g.group.ctx); err != nil {
+			g.mtx.Lock()
+			defer g.mtx.Unlock()
+
+			// TODO(mway): Consider using a builtin wrapping convention rather
+			//             than multierr.
+			g.group.err = multierr.Combine(g.group.err, err)
+			g.group.cancel()
+		}
+	}()
+}
+
+// Wait blocks until all function calls from the Go method have returned, then
+// returns all non-nil errors (if any) from them, combined via multierr.
+func (g *MultiGroup) Wait() error {
+	return g.group.Wait()
 }
