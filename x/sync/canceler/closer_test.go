@@ -75,7 +75,7 @@ func TestCancelerInheritance(t *testing.T) {
 		select {
 		case <-canceler.C():
 		case <-ctx.Done():
-			require.Fail(t, "ancestor canceler did not close descendant")
+			require.Fail(t, "ancestor canceler did not cancel descendant")
 		}
 	}
 }
