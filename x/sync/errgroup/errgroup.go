@@ -18,8 +18,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// Package errgroup is a minor refactor of golang.org/x/sync/errgroup to better
-// enable context propagation and short-circuiting of managed goroutines.
 package errgroup
 
 import (
