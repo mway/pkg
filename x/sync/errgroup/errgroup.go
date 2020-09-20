@@ -90,7 +90,7 @@ func (g *Group) Wait() error {
 // MultiGroup is a Group variant that accumulates errors rather than simply
 // returning the first encountered. Semantically, this affords callers the
 // ability to determine whether or not launched goroutines should abort
-// immediately once the provided context is cancelled. If callers choose not
+// immediately once the provided context is canceled. If callers choose not
 // to respect the context, it is their responsibility to ensure that goroutines
 // do not leak.
 type MultiGroup struct {
