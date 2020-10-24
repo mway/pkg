@@ -12,7 +12,7 @@ import (
 // The zero value for Canceler is valid and ready for use.
 type Canceler struct {
 	ch     chan struct{}
-	mtx    sync.Mutex
+	mtx    sync.RWMutex
 	parent <-chan struct{}
 }
 
@@ -33,37 +33,54 @@ func New(parent *Canceler) *Canceler {
 // C returns a wait channel. Both Canceler and the channel returned by C() may
 // be shared across API boundaries and goroutines.
 func (c *Canceler) C() <-chan struct{} {
-	c.mtx.Lock()
-	defer c.mtx.Unlock()
+	var ch <-chan struct{}
 
+	c.mtx.RLock()
 	if c.ch == nil {
-		c.ch = make(chan struct{})
+		c.mtx.RUnlock()
+		c.mtx.Lock()
+		if c.ch == nil {
+			c.ch = make(chan struct{})
+			ch = c.ch
 
-		go func() {
-			select {
-			case <-c.parent:
-				close(c.ch)
-			case <-c.ch:
-			}
-		}()
+			go func() {
+				select {
+				case <-c.parent:
+					close(c.ch)
+				case <-c.ch:
+				}
+			}()
+		}
+		c.mtx.Unlock()
+	} else {
+		ch = c.ch
+		c.mtx.RUnlock()
 	}
 
-	return c.ch
+	return ch
 }
 
 // Cancel causes the channel returned by C() to unblock, signaling receivers to
 // close.
 func (c *Canceler) Cancel() {
-	c.mtx.Lock()
+	var ch chan struct{}
+
+	c.mtx.RLock()
 	if c.ch == nil {
+		c.mtx.RUnlock()
+		c.mtx.Lock()
 		c.ch = make(chan struct{})
-		close(c.ch)
+		ch = c.ch
+		close(ch)
+		c.mtx.Unlock()
+	} else {
+		ch = c.ch
+		c.mtx.RUnlock()
 	}
-	c.mtx.Unlock()
 
 	select {
-	case <-c.ch:
+	case <-ch:
 	default:
-		close(c.ch)
+		close(ch)
 	}
 }
