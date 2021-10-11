@@ -21,7 +21,12 @@ func TestCanceler(t *testing.T) {
 	require.Equal(t, ch1, ch2, "C() returned different channels")
 	require.Equal(t, ch2, ch3, "C() returned different channels")
 
-	c.Cancel()
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		c.Cancel()
+	}()
+	<-done
 
 	for _, ch := range []<-chan struct{}{ch1, ch2, ch3} {
 		select {
